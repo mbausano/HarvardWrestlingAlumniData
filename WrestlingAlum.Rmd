@@ -1,0 +1,83 @@
+---
+title: "WrestlingAlumshift"
+author: "Michael Bausano"
+date: "12/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(geojson)
+library(rstanarm)
+library(readxl)
+library(sf)
+library(fs)
+library(leaflet)
+library(raster)
+library(sp)
+library(janitor)
+library(usmap)
+library(maps)
+library(purrr)
+library(DT)
+library(gt)
+library(gtsummary)
+```
+
+
+```{r cars}
+alum <- read_csv("raw_data/alum_info.csv")
+states <- read_excel("raw_data/uscities.xlsx")
+
+lonlat <- states %>%
+  dplyr::select(city_ascii, state_id, lat, lng) %>% 
+  rename(state = "state_id")
+alum <- left_join(alum, lonlat, by = c('City'='city_ascii', 'State'='state'))
+```
+
+```{r}
+clean_alum <- alum %>%
+  dplyr::select(State, Industry) %>%
+  drop_na() %>% 
+  group_by(Industry, State) %>%
+  summarize(count = n())
+clean_alum %>%
+  ggplot(mapping = aes( x = Industry, y= count)) +
+  ggrepel::geom_label_repel(aes(label = State), label.size = .05, color = "blue") +theme_minimal() +
+  labs(title = "Number of Wreslters in Each Profession", 
+         subtitle = "Labeled by State",
+           y = "Number of Wreslters", x = "Industry")
+ 
+  
+```
+```{r}
+greenLeafIcon <- makeIcon(
+  iconUrl = "http://leafletjs.com/examples/custom-icons/leaf-green.png",
+  iconWidth = 24, iconHeight = 52,
+  iconAnchorX = 10, iconAnchorY = 46,
+)
+```
+```{r}
+content <- alum %>%
+  dplyr::select(Name, Industry)
+```
+
+```{r}
+alum_by_year <- alum %>%
+  dplyr::select(GradYear) %>%
+  drop_na() %>%
+  group_by(GradYear) %>%
+  summarize(count = n()) 
+alum_by_year %>%
+  ggplot(mapping = aes(x = GradYear, y= count)) +
+  geom_point() + geom_smooth(method = lm)
+
+lmmodel <- lm(count ~ GradYear, data = alum_by_year) %>%
+  tbl_regression(intercept = TRUE)
+lmmodel
+gt_tbl <- lmmodel %>%
+  gt() 
+```
+

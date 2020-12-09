@@ -1,0 +1,12 @@
+name: HarvardWrestlingDatabasePBausano
+title: HarvardWrestlingDatabasePBausano
+username:
+account: pierce-bausano
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3372600
+bundleId: 3960481
+url: https://pierce-bausano.shinyapps.io/HarvardWrestlingDatabasePBausano/
+when: 1607440268.31852
+asMultiple: FALSE
+asStatic: FALSE
