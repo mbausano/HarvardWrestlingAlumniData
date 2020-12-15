@@ -114,7 +114,7 @@ ui <- fluidPage(
     
                         hr(),
                         # Repository Link
-                        h5("Github Repository: https://github.com/mbausano/ShinyFinalPBausano"))))
+                        h5("Github Repository: https://github.com/mbausano/HarvardWrestlingAlumniData"))))
 
 server <- function(input, output, session) {
     
