@@ -25,8 +25,6 @@ states <- c("MA", "NY", "AZ", "FL", "CA", "TX",
 
 ui <- fluidPage(
     navbarPage("Harvard Wrestling Database", theme = shinytheme("superhero"),
-               
-               #The first tab is the map which was made using leaflet
                tabPanel("Map",
                         fluidPage(
                             titlePanel("Home States of Alumni Based in the United States"),
@@ -36,15 +34,11 @@ ui <- fluidPage(
                             leafletOutput("mymap", height = "600"),
                             p("This  map  shows the home state of Wrestling Alums, there are no current foreign born wrestlers.")
                         )),
-               
-               
-               #The second tab is the search tab which was made using DT in the server.
                tabPanel("Search",
                         titlePanel("Wrestling Alumns"),
                         mainPanel(
                             DTOutput('search'), width = "100%", height = "auto"
                         )),
-              
                 tabPanel("Regression",
                         titlePanel("Industry by Region"),
                         sidebarLayout(sidebarPanel(
@@ -58,13 +52,25 @@ ui <- fluidPage(
                                 selected = c("NY", "MA")
                             )
                         ),
-                        mainPanel( plotOutput("mygraph"), 
+                        mainPanel( plotOutput("mygraph"),
+                                   h4("The Graph"),
+                                   p("This is a graphical analysis of industry by count, each point is labeled  by state and the radio 
+                          buttons allow the user to sort by only states that are of interested. This was an interesting mini case
+                          study in both the prevelance of different careers in different geographic regions and the popularity more
+                          broadly of various cities post-grad"),
+                                   br(),
 
                                    
-                                   gt_output("mytable")
+                                   gt_output("mytable"),
+                                   h4("The Regression"),
+                                   p("The regression provides an estimation, based on the class year, of the predicted size of the team
+                          although currentlimitations to the sample size do not make it as reliable, as the dataset grows, 
+                          the regression should become an increasingly accurate predictor of team size"),
+                        
+                                   
                             
                       ) )),
-               #The third tab is the About page.
+          
                tabPanel("About",
                         titlePanel(h3("Consolidation and Analysis of The Harvard Wrestling ALumni Network")),
                         
@@ -76,8 +82,7 @@ ui <- fluidPage(
                            providing other teams, and organizations with a tool that they could use to collate and 
                            analyze their alumni databases"),
                         
-                        # The br() function adds white space to the app.
-                        # Data Collection Explanation
+                    
                         br(),
                         h4("Sources for Data"), 
                         p("Data for this project was maually pulled from various sources including; past team rosters,
@@ -87,7 +92,6 @@ ui <- fluidPage(
                           future iterationns."),
                         br(),
                         
-                        # Map Page Explanation
                         h4("The US Map"),
                         p("The map is a blank U.S. state map that uses the Leaflet program to overlay data onto it. By 
                           building polygons that represent the states and assigning each wrestlers home city a  distinct
@@ -95,49 +99,23 @@ ui <- fluidPage(
                           sense of geographic diversity."),
                         br(),
                         
-                        # Search Page Explanation
                         h4("The Directory"),
                         p("This is a searchable database. It places all the important data from all data sources in one place
                           that allows the user to search by a word in ay of the listed columns. Ideally, a name pulled from the
                           visual interface prior could  then be searched here for further information about the individual"),
                         br(),
-                        
-                        h4("The Regression"),
-                        p("The regression provides an estimation, based on the class year, of the predicted size of the team
-                          although currentlimitations to the sample size do not make it as reliable, as the dataset grows, 
-                          the regression should become an increasingly accurate predictor of team size"),
-                        br(),
-                        
-                        h4("The Graph"),
-                        p("This is a graphical analysis of industry by counnt, each point is labeled  by state and the radio 
-                          buttons allow the user to sort by only states that are of interested. This was an interesting mini case
-                          study in both the prevelance of different careers in different geographic regions and the popularity more
-                          broadly of various cities post-grad"),
-                        br(),
-                        
-                        #Bio
+                      
                         h4("About"),
                         p("My name is Pierce Bausano and  I am a junior in Lowell House concentrating in Government with a Secondary
                           in economics. Post graduation, I plan on working for a few years before pursuing the possibility of graduate 
                           school"),
                         br(),
                         
-                        #Embed the video link into the About Page.
-                        h4("Project Video"),
-                        p("Blank"),
-                        br(),
-                        
-                        
-                        h4("Note"),
-                        p("Blank"), 
-                        
-                        br(),
+    
                         hr(),
                         # Repository Link
-                        h5("Github Repository:"))))
+                        h5("Github Repository: https://github.com/mbausano/ShinyFinalPBausano"))))
 
-
-#The server portion of the app, which takes the inputs and produces outputs
 server <- function(input, output, session) {
     
     output$search <- DT::renderDT({
@@ -158,7 +136,6 @@ server <- function(input, output, session) {
         
     }, escape = FALSE)
     
-    #Create the map ouput using leaflet
     output$mymap <- renderLeaflet({
         mapStates = maps::map("state", fill = TRUE, plot = FALSE)
         leaflet(data = mapStates) %>% 
@@ -170,7 +147,6 @@ server <- function(input, output, session) {
                              options = providerTileOptions(noWrap = FALSE)
             ) %>%
             addTiles() %>%
-            # Making sure the map has the shapes of the states, is colorful, and has markers.
             addPolygons(fillColor = terrain.colors(15, alpha = NULL), stroke = FALSE) %>%
             addMarkers(data = alum, ~lng, ~lat, popup = ~as.character(Name), 
                       icon = greenLeafIcon)
@@ -206,5 +182,4 @@ server <- function(input, output, session) {
 }
 
 
-# Run the application 
 shinyApp(ui = ui, server = server)
